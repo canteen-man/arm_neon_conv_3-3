@@ -1,0 +1,1 @@
+ g++ -o neon main.cpp -mfpu=neon `pkg-config --cflags --libs opencv`
