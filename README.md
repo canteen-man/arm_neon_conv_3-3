@@ -21,4 +21,4 @@ Accelerate with the following instruction set：
    vaddq_s16
    //add eight data at the same time by SIMD
 Compile command：
- g++ -o neon main.cpp -mfpu=neon `pkg-config --cflags --libs opencv`
+” g++ -o neon main.cpp -mfpu=neon `pkg-config --cflags --libs opencv`”
