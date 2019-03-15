@@ -1,8 +1,8 @@
 #include <iostream>
 #include <stdio.h>
-#include<opencv2/opencv.hpp>//opencv头文件
-#include <opencv2/imgproc.hpp>//opencv头文件
-#include <opencv2/highgui.hpp>//opencv头文件
+#include<opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include <arm_neon.h>
 
 using namespace std;
@@ -49,10 +49,9 @@ int im2col_get_pixel(int *im, int height, int width, int channels,
 int* neon_gemm(int* data_col,int* w,int* out,int len)//3*3 conv
 {
 	
-           int iter_total=len/9;
-              
-               int* A=new int[9];
-             int16_t* weight=(int16_t*)w;
+           int iter_total=len/9;  
+           int* A=new int[9];
+           int16_t* weight=(int16_t*)w;
    for(int iter=0;iter<iter_total;iter++){
           for(int mul=0;mul<9;mul++){
           A[mul]= data_col[iter*9+mul];    
@@ -64,18 +63,18 @@ int* neon_gemm(int* data_col,int* w,int* out,int len)//3*3 conv
 	{
           
 	  int16x8_t data_vec = vld1q_s16(arr);
-        int16x8_t w_vec = vld1q_s16(weight);
+          int16x8_t w_vec = vld1q_s16(weight);
 	  int16x8_t mul_v = vmulq_s16(data_vec, w_vec); 
-        sum_vec = vaddq_s16(sum_vec, mul_v);
+          sum_vec = vaddq_s16(sum_vec, mul_v);
 	}
        int sum = vgetq_lane_s16(sum_vec, 0)+vgetq_lane_s16(sum_vec, 1)+vgetq_lane_s16(sum_vec, 2)+vgetq_lane_s16(sum_vec, 3);
           
-     int sum_rc=round((sum+out_9)/9);
-     out[iter]=sum_rc;
+       int sum_rc=round((sum+out_9)/9);
+       out[iter]=sum_rc;
     
   }
-   delete A;
-   return out;
+    delete A;
+    return out;
 }
 
 
@@ -116,33 +115,30 @@ int main()
     int stride=1;
     int pad=1;
     int out_col = (width + 2*pad - ksize) / stride + 1;
-     int out_row= (height + 2*pad - ksize) / stride + 1;
+    int out_row= (height + 2*pad - ksize) / stride + 1;
     int in_len=(channels *ksize *ksize*out_row ) * out_col ;
      cout<<in_len<<endl;
-   int* data_col=new int[in_len];
-   im2col_cpu( im,channels,  height,  width, ksize,   stride, pad, data_col);
+    int* data_col=new int[in_len];
+    im2col_cpu( im,channels,  height,  width, ksize,   stride, pad, data_col);
     
     int weight[9]={1,2,3,4,5,6,7,8,9};//从此处读入卷积权重
-     int* w=weight;
-
-      int out_len=out_col*out_row;
-      int* out=new int[out_len];
-     out= neon_gemm(data_col,w,out,in_len);
-   for(int i=0;i<out_len;i++)
+    int* w=weight;
+    int out_len=out_col*out_row;
+    int* out=new int[out_len];
+    out= neon_gemm(data_col,w,out,in_len);
+    for(int i=0;i<out_len;i++)
 	{
 	cout<<out[i]<<endl;	
 	}
-
-
        // 释放分配空间
        for (int i = 0; i < row; i ++){
            delete []La[i];
        }
        delete [] La;
-      delete data_col;
+       delete data_col;
        delete im;
-         delete out;
-    return 0;
+       delete out;
+   return 0;
 }
 
 
